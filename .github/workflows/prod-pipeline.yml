@@ -1,0 +1,57 @@
+name: 'Deployment Pipeline'
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          registry-url: 'https://npm.pkg.github.com'
+          alwayrs-auth: true
+          cache: yarn
+          cache-dependency-path: '**/yarn.lock'
+        env:
+          AWS_ACCOUNT_NUMBER: ${{ secrets.AWS_ACCOUNT_NUMBER }}
+          SECRET_NAME: ${{ secrets.SECRET_NAME }}
+
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Install AWSCLI
+        run: |
+          curl "https://aws.cli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          ./aws/install --update
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1-node18
+        with:
+            aws-region: us-east-1
+            role-to-assume: 'arn:aws:iam::${{ secrets.AWS_ACCOUNT_NUMBER }}:role/weather-api-github-action-runner'
+            role-duration-seconds: 3600
+            role-skip-session-tagging: true
+      
+      - name: Deploy API
+        shell: bash
+        run: yarn cdk deploy
