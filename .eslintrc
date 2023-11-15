@@ -1,0 +1,31 @@
+{
+    "parser": "@typescript-eslint/parser",
+    "extends": [
+        "plugin:@typescript-eslint/recommended",
+        "plugin:prettier/recommended"
+    ],
+    "rules": {
+        "@typescript/no-unused-vars": [
+            "error",
+            {
+                "ignoreRestSimblings": true,
+                "argsIgnorePattern": "^_"
+            }
+        ]
+    },
+    "overrides": [
+        {
+            "files": ["*.{js,jsx}"],
+            "rules": {
+                "@typescript-eslint/require-await": "off",
+                "@typescript-eslint/no-floating-promises": ["off"]
+            }
+        },
+        {
+            "files": ["*.ts"],
+            "rules": {
+                "@typescirpt-eslint/no-explicit-any": "off"
+            }
+        }
+    ]
+}
