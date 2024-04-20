@@ -38,14 +38,14 @@ jobs:
       - name: Install Dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-            aws-region: us-east-1
-            role-to-assume: 'arn:aws:iam::${{ secrets.AWS_ACCOUNT_NUMBER }}:role/weather-api-github-action-runner'
-            role-duration-seconds: 3600
-            role-skip-session-tagging: true
+      # - name: Configure AWS Credentials
+      #   uses: aws-actions/configure-aws-credentials@v2
+      #   with:
+      #       aws-region: us-east-1
+      #       role-to-assume: 'arn:aws:iam::${{ secrets.AWS_ACCOUNT_NUMBER }}:role/weather-api-github-action-runner'
+      #       role-duration-seconds: 3600
+      #       role-skip-session-tagging: true
       
-      - name: Deploy API
-        shell: bash
-        run: yarn cdk deploy
+      # - name: Deploy API
+      #   shell: bash
+      #   run: yarn cdk deploy

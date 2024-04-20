@@ -26,3 +26,4 @@ Coming soon!
 - Add weather lookup by city/state
 - Add jest unit testing
 - Figure out steps to run lambda locally
+- Github Actions for automated deployment
