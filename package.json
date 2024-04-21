@@ -9,7 +9,8 @@
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",
-    "deploy": "cdk deploy"
+    "deploy": "cdk deploy",
+    "local": "lambda-local -l handlers/weather.js -h handler --watch 8008"
   },
   "devDependencies": {
     "@types/node": "18.14.6",
@@ -19,7 +20,8 @@
     "@aws-sdk/client-secrets-manager": "^3.423.0",
     "esbuild": "^0.15.12",
     "eslint-config-prettier": "9.0.0",
-    "eslint-plugin-prettier": "^4.0.0"
+    "eslint-plugin-prettier": "^4.0.0",
+    "lambda-local": "^2.2.0"
   },
   "dependencies": {
     "aws-lambda": "^1.0.7",
