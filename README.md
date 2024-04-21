@@ -17,6 +17,17 @@ This is a production ready backend for retrieving weather information. The infor
 
 If you are deploying this, you will need to replace the code for the website used to access this or comment out the code.
 
+# Running Locally
+1. `cd` into the root directory of the project
+2. Run `yarn`
+3. Run `yarn local`
+
+```
+curl --request GET \
+  --url http://localhost:8008/ \
+  --header 'content-type: application/json'
+```
+
 # Testing
 
 Coming soon!
@@ -24,6 +35,5 @@ Coming soon!
 # Future updates
 - Add integration testing
 - Add weather lookup by city/state
-- Add jest unit testing
-- Figure out steps to run lambda locally
 - Github Actions for automated deployment
+- Better Error handling

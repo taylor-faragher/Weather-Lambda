@@ -33,7 +33,6 @@ jobs:
           cache-dependency-path: '**/yarn.lock'
         env:
           AWS_ACCOUNT_NUMBER: ${{ secrets.AWS_ACCOUNT_NUMBER }}
-          SECRET_NAME: ${{ secrets.SECRET_NAME }}
 
       - name: Install Dependencies
         run: yarn install --frozen-lockfile
