@@ -36,4 +36,3 @@ Coming soon!
 - Add integration testing
 - Add weather lookup by city/state
 - Github Actions for automated deployment
-- Better Error handling
