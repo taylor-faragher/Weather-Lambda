@@ -43,7 +43,6 @@ export class WeatherByZipCodeStack extends Stack {
       defaultCorsPreflightOptions: {
         allowOrigins: ['*'],
         allowMethods: ['GET', 'OPTIONS'],
-        statusCode: 200
       },
       domainName: {
         domainName: 'api.taylorsweatherapi.com',
