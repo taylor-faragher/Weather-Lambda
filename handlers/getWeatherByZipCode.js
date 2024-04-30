@@ -14,6 +14,6 @@ exports.getWeatherByZipCode = async (zipCode) => {
             }
         }
     } catch (error) {
-        console.log(`There was an error fetching the weather in the lamba: ${error}`)
+        console.log(`There was an error fetching the weather in the lambda: ${error}`)
     }
 }

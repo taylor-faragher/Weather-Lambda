@@ -8,7 +8,10 @@ exports.getWeather = async () => {
         } //allows me to see openweathermap errors in cloudwatch
         return {
             statusCode: res.status,
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
+            headers: {
+                    "Access-Control-Allow-Origin": "*",
+                },
         }
     } catch (error) {
         console.log(`There was an error fetching the weather in the lambda: ${error}`)
