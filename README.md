@@ -30,7 +30,10 @@ curl --request GET \
 
 # Testing
 
-Coming soon!
+### Unit Testing
+1. `cd` to the root directory of the project
+2. Run `yarn`
+3. Run `yarn test`
 
 # Future updates
 - Add integration testing
