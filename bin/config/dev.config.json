@@ -1,0 +1,8 @@
+{
+    "env": "dev",
+    "region": "us-east-1",
+    "domain": "taylorsweatherapi.com",
+    "fullDomain": "dev.taylorsweatherapi.com",
+    "lambdaFunctionName": "GetWeatherByZipCodeDevHandler",
+    "restApiName": "GetWeatherByZipCodeApiDev"
+}
