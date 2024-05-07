@@ -9,7 +9,8 @@
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",
-    "deploy": "cdk deploy",
+    "deploy": "cdk deploy -c env=dev",
+    "deploy:prod": "cdk deploy -c env=prod",
     "local": "lambda-local -l handlers/weather.js -h handler --watch 8008"
   },
   "devDependencies": {
