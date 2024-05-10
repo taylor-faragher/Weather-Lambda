@@ -6,9 +6,8 @@ const config = {
     preset: 'ts-jest/presets/js-with-ts-esm',
 
     // from https://stackoverflow.com/a/57916712/15076557
-    transformIgnorePatterns: [
-        'node_modules/(?!(module-that-needs-to-be-transformed)/)' 
-    ],
+    // tells jest to ignore node_modules
+    transformIgnorePatterns: ["/node_modules/"],
     transform: {
         '^.+\\.tsx?$': ['ts-jest', {
             useESM: true
