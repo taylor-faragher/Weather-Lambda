@@ -35,6 +35,7 @@ jobs:
           cache-dependency-path: '**/yarn.lock'
         env:
           AWS_ACCOUNT_NUMBER: ${{ secrets.AWS_ACCOUNT_NUMBER }}
+          OPEN_WEATHER_API_ID: ${{ secrets.OPEN_WEATHER_API_ID }}
           AWS_REGION: us-east-1
 
       - name: Install Dependencies
