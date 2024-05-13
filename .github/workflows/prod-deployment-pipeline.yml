@@ -1,0 +1,65 @@
+name: 'Weather Lambda Prod Deployment'
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches: [main]
+    types: [closed]
+
+env:
+  AWS_REGION : 'us-east-1'
+  AWS_ACCOUNT_NUMBER: ${{ secrets.AWS_ACCOUNT_NUMBER }}
+  OPEN_WEATHER_API_ID: ${{ secrets.OPEN_WEATHER_API_ID }}
+
+permissions:
+  contents: read
+  pull-requests: read
+  id-token: write
+
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  weatherLambdaProdDeployment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          registry-url: 'https://npm.pkg.github.com'
+          always-auth: true
+          cache: yarn
+          cache-dependency-path: '**/yarn.lock'
+        env:
+          AWS_ACCOUNT_NUMBER: ${{ secrets.AWS_ACCOUNT_NUMBER }}
+          AWS_REGION: us-east-1
+
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Install AWS CDK
+        run: yarn add aws-cdk
+      
+      - name : Run Unit Tests
+        run: yarn test
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_NUMBER }}:role/GithubActionsProvider
+          role-session-name: prodDeployment
+          aws-region: us-east-1
+
+      - name: Deploy Prod
+        shell: bash
+        run: |
+              echo "yarn deploy:prod"
+              yarn deploy:prod

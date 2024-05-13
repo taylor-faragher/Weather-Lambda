@@ -14,6 +14,6 @@ exports.getWeather = async () => {
                 },
         }
     } catch (error) {
-        console.log(`There was an error fetching the weather in the lambda: ${error}`)
+        console.log(`There was an error fetching the weather in the lambda: ${error.message}`)
     }
 }

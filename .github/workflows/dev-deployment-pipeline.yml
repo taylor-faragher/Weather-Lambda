@@ -1,23 +1,26 @@
-name: 'Deployment Pipeline'
+name: 'Weather Lambda Dev Deployment'
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
   pull_request:
     branches: [main]
+
+env:
+  AWS_REGION : 'us-east-1'
+  AWS_ACCOUNT_NUMBER: ${{ secrets.AWS_ACCOUNT_NUMBER }}
+  OPEN_WEATHER_API_ID: ${{ secrets.OPEN_WEATHER_API_ID }}
 
 permissions:
   contents: read
   pull-requests: read
+  id-token: write
 
 concurrency:
   group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
   cancel-in-progress: true
 
 jobs:
-  pipeline:
+  weatherLambdaDevDeployment:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -36,6 +39,22 @@ jobs:
 
       - name: Install Dependencies
         run: yarn install --frozen-lockfile
+
+      - name: Install AWS CDK
+        run: yarn add aws-cdk
       
       - name : Run Unit Tests
         run: yarn test
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_NUMBER }}:role/GithubActionsProvider
+          role-session-name: devDeployment
+          aws-region: us-east-1
+
+      - name: Deploy Dev
+        shell: bash
+        run: |
+              echo "yarn deploy"
+              yarn deploy
