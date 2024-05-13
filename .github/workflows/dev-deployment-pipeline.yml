@@ -1,10 +1,7 @@
-name: 'Deployment Pipeline'
+name: 'Weather Lambda Prod Deployment'
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
   pull_request:
     branches: [main]
 
@@ -22,7 +19,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  prodDeployment:
+  weatherLambdaProdDeployment:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -50,5 +47,11 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v3
         with:
           role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_NUMBER }}:role/GithubActionsProvider
-          role-session-name: prodDeployment
+          role-session-name: devDeployment
           aws-region: us-east-1
+
+      - name: Deploy Dev
+        shell: bash
+        run: |
+              echo "yarn deploy"
+              yarn deploy
