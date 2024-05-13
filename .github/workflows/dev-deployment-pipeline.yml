@@ -36,8 +36,6 @@ jobs:
           cache-dependency-path: '**/yarn.lock'
         env:
           AWS_ACCOUNT_NUMBER: ${{ secrets.AWS_ACCOUNT_NUMBER }}
-          OPEN_WEATHER_API_ID: ${{ secrets.OPEN_WEATHER_API_ID }}
-          AWS_REGION: us-east-1
 
       - name: Install Dependencies
         run: yarn install --frozen-lockfile
@@ -51,7 +49,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
-          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_NUMBER }}:role/GithubActionsProvider
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_NUMBER }}:role/github-action-runner
           role-session-name: devDeployment
           aws-region: us-east-1
 
