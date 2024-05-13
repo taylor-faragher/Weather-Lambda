@@ -19,7 +19,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  weatherLambdaProdDeployment:
+  weatherLambdaDevDeployment:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -41,7 +41,7 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Install AWS CDK
-        run: yarn install aws-cdk
+        run: yarn add aws-cdk
       
       - name : Run Unit Tests
         run: yarn test
