@@ -2,6 +2,9 @@ name: 'Weather Lambda Prod Deployment'
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
   pull_request:
     branches: [main]
     types: [closed]
@@ -9,6 +12,7 @@ on:
 env:
   AWS_REGION : 'us-east-1'
   AWS_ACCOUNT_NUMBER: ${{ secrets.AWS_ACCOUNT_NUMBER }}
+  OPEN_WEATHER_API_ID: ${{ secrets.OPEN_WEATHER_API_ID }}
 
 permissions:
   contents: read
@@ -40,6 +44,9 @@ jobs:
 
       - name: Install Dependencies
         run: yarn install --frozen-lockfile
+
+      - name: Install AWS CDK
+        run: yarn add aws-cdk
       
       - name : Run Unit Tests
         run: yarn test
