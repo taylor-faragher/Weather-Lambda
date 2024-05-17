@@ -18,7 +18,7 @@ export class WeatherByZipCodeStack extends Stack {
         const openWeatherId = process.env.OPEN_WEATHER_API_ID;
 
         const decryptedApiKey = getSecretByArn(this, 'openWeatherKey', {
-            secretArn: `arn:aws:secretsmanager:us-east-1:${props?.env?.account}:secret:${openWeatherId}`,
+            secretCompleteArn: `arn:aws:secretsmanager:us-east-1:${props?.env?.account}:secret:${openWeatherId}`,
         });
 
         const weather = new NodejsFunction(this, 'WeatherByZipCodeGetHandler', {
