@@ -1,10 +1,10 @@
 import * as fs from 'fs';
-import { getCdkConfig } from './getCdkConfig';
+import {getCdkConfig} from './getCdkConfig';
 
 jest.mock('fs');
 
 describe('getCdkConfig', () => {
-    const mockConfig = { key: 'value' };
+    const mockConfig = {key: 'value'};
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -14,7 +14,7 @@ describe('getCdkConfig', () => {
         const env = 'dev';
         const mockJson = JSON.stringify(mockConfig);
         jest.spyOn(fs, 'existsSync').mockReturnValue(true);
-        jest.spyOn(fs, 'readFileSync').mockReturnValue(mockJson)
+        jest.spyOn(fs, 'readFileSync').mockReturnValue(mockJson);
 
         const config = getCdkConfig(env);
 
@@ -43,8 +43,8 @@ describe('getCdkConfig', () => {
         const env = 'dev';
         const invalidJson = '{ key: "value"'; // invalid JSON
         jest.spyOn(fs, 'existsSync').mockReturnValue(true);
-        jest.spyOn(fs, 'readFileSync').mockReturnValue(invalidJson)
-        
+        jest.spyOn(fs, 'readFileSync').mockReturnValue(invalidJson);
+
         expect(() => getCdkConfig(env)).toThrow(SyntaxError);
 
         expect(fs.existsSync).toHaveBeenCalledWith(`bin/config/${env}.config.json`);

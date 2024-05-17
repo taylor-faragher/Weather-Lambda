@@ -9,4 +9,4 @@ export const getCdkConfig = (env: string) => {
     }
 
     return JSON.parse(fs.readFileSync(configPath, 'utf8'));
-}
+};
