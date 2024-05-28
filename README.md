@@ -36,5 +36,4 @@ curl --request GET \
 3. Run `yarn test`
 
 # Future updates
-- Add integration testing
 - Add weather lookup by city/state
