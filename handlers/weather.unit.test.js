@@ -1,4 +1,5 @@
-const { handler } = require('./weather');
+/* eslint-disable @typescript-eslint/no-var-requires */
+const {handler} = require('./weather');
 const weatherService = require('./getWeather');
 const weatherByZipCodeService = require('./getWeatherByZipCode');
 
@@ -21,7 +22,7 @@ describe('Weather Handler Tests', () => {
     });
 
     it('fetches weather by zipcode', async () => {
-        const event = { queryStringParameters: { zipcode: '10001' } };
+        const event = {queryStringParameters: {zipcode: '10001'}};
         weatherByZipCodeService.getWeatherByZipCode.mockResolvedValue('weather data by zip code');
 
         const result = await handler(event);
@@ -31,46 +32,46 @@ describe('Weather Handler Tests', () => {
     });
 
     it('returns not implemented message for city and state lookup', async () => {
-        const event = { queryStringParameters: { city: 'New York', state: 'NY' } };
+        const event = {queryStringParameters: {city: 'New York', state: 'NY'}};
 
         const result = await handler(event);
 
         expect(result).toEqual({
             statusCode: 200,
-            body: "Not Implemented yet!"
+            body: 'Not Implemented yet!',
         });
     });
 
     it('returns 400 when for city lookup when state is missing', async () => {
-        const event = { queryStringParameters: { city: 'New York' } };  // No state provided
+        const event = {queryStringParameters: {city: 'New York'}}; // No state provided
 
         const result = await handler(event);
 
         expect(result).toEqual({
             statusCode: 400,
-            body: "Bad Request. Please send correct data."
+            body: 'Bad Request. Please send correct data.',
         });
     });
 
     it('returns 400 when for city lookup when city is missing', async () => {
-        const event = { queryStringParameters: { state: 'NY' } };  // No city provided
+        const event = {queryStringParameters: {state: 'NY'}}; // No city provided
 
         const result = await handler(event);
 
         expect(result).toEqual({
             statusCode: 400,
-            body: "Bad Request. Please send correct data."
+            body: 'Bad Request. Please send correct data.',
         });
     });
 
     it('returns bad request when both city and state are provided without values', async () => {
-        const event = { queryStringParameters: { city: '', state: '' } };
+        const event = {queryStringParameters: {city: '', state: ''}};
 
         const result = await handler(event);
 
         expect(result).toEqual({
             statusCode: 400,
-            body: "Bad Request. Please send correct data."
+            body: 'Bad Request. Please send correct data.',
         });
     });
 });
