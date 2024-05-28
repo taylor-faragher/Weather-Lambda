@@ -11,7 +11,7 @@ This is a production ready backend for retrieving weather information. The infor
 5. Make sure your AWS region and account number are exported in your terminal:
    - `export REGION=us-east-1`
    - `export AWS-ACCOUNT_NUMBER=<accountNumber>`
-4. Run `yarn deploy`
+6. Run `yarn deploy`
 
 ## Important!
 
@@ -38,4 +38,3 @@ curl --request GET \
 # Future updates
 - Add integration testing
 - Add weather lookup by city/state
-- Github Actions for automated deployment
