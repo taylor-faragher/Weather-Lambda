@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const weatherService = require('./getWeather');
 const weatherByZipCodeService = require('./getWeatherByZipCode');
 
