@@ -1,5 +1,5 @@
-const weatherService = require('./getWeather');
-const weatherByZipCodeService = require('./getWeatherByZipCode');
+import weatherService from './getWeather';
+import weatherByZipCodeService from './getWeatherByZipCode';
 
 exports.handler = async function (event) {
     let operation;
@@ -17,11 +17,11 @@ exports.handler = async function (event) {
         if (event.queryStringParameters.city) {
             city = event.queryStringParameters.city;
         }
-    
+
         if (event.queryStringParameters.state) {
             state = event.queryStringParameters.state;
         }
-    
+
         if (city && state) {
             operation = 'cityLookup';
         }
@@ -39,25 +39,25 @@ exports.handler = async function (event) {
         }
         case 'zipCode': {
             console.log('zipCode: ', zipCode);
-            result = await weatherByZipCodeService.getWeatherByZipCode(zipCode.toString())
+            result = await weatherByZipCodeService.getWeatherByZipCode(zipCode.toString());
             break;
         }
         case 'cityLookup': {
-            result = new Promise((resolve) => {
+            result = new Promise(resolve => {
                 resolve({
                     statusCode: 200,
-                    body: "Not Implemented yet!"
-                })
+                    body: 'Not Implemented yet!',
+                });
             });
             break;
         }
         default: {
-            result = new Promise((resolve) => {
+            result = new Promise(resolve => {
                 resolve({
                     statusCode: 400,
-                    body: "Bad Request. Please send correct data."
-                })
-            })
+                    body: 'Bad Request. Please send correct data.',
+                });
+            });
             break;
         }
     }
