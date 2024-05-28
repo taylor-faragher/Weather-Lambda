@@ -8,7 +8,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "lint": "eslint \"./**/*.{js,jsx,ts}\" --max-warnings 0",
+    "lint": "eslint . --ext .js,.ts --max-warnings 0",
     "test": "jest unit",
     "integration": "jest integration",
     "deploy": "cdk deploy -c env=dev",
