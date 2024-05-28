@@ -43,8 +43,11 @@ jobs:
       - name: Install AWS CDK
         run: yarn add aws-cdk
       
-      - name : Run Unit Tests
-        run: yarn test
+      - name: Run Unit Tests
+        run: yarn test unit
+
+      - name: Run Integration Tests
+        run: yarn test integration
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v3
