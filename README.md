@@ -33,12 +33,12 @@ curl --request GET \
 ### Unit Testing
 1. `cd` to the root directory of the project
 2. Run `yarn`
-3. Run `yarn test unit`
+3. Run `yarn test`
 
 ### Integration Testing
 1. `cd` to the root directory of the project
 2. Run `yarn`
-3. Run `yarn test integration`
+3. Run `yarn integration`
 
 # Future updates
 - Add weather lookup by city/state
