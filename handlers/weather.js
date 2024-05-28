@@ -1,5 +1,5 @@
-import weatherService from './getWeather';
-import weatherByZipCodeService from './getWeatherByZipCode';
+const weatherService = require('./getWeather');
+const weatherByZipCodeService = require('./getWeatherByZipCode');
 
 exports.handler = async function (event) {
     let operation;
