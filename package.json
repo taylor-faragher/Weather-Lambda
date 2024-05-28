@@ -8,8 +8,9 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "lint": "eslint . --ext .js,.ts --max-warnings 0",
-    "test": "jest",
+    "lint": "eslint \"./**/*.{js,jsx,ts}\" --max-warnings 0",
+    "test": "jest unit",
+    "integration": "jest integration",
     "deploy": "cdk deploy -c env=dev",
     "deploy:prod": "cdk deploy -c env=prod",
     "local": "lambda-local -l handlers/weather.js -h handler --watch 8008"
