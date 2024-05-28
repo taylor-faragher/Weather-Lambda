@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const weatherService = require('./getWeather');
 const weatherByZipCodeService = require('./getWeatherByZipCode');
 
@@ -46,7 +47,7 @@ exports.handler = async function (event) {
             result = new Promise(resolve => {
                 resolve({
                     statusCode: 200,
-                    body: 'Not Implemented yet!',
+                    body: JSON.stringify({message: 'Not Implemented yet!'}),
                 });
             });
             break;
@@ -55,7 +56,7 @@ exports.handler = async function (event) {
             result = new Promise(resolve => {
                 resolve({
                     statusCode: 400,
-                    body: 'Bad Request. Please send correct data.',
+                    body: JSON.stringify({error: 'Bad Request. Please send correct data.'}),
                 });
             });
             break;

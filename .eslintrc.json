@@ -27,5 +27,6 @@
                 "argsIgnorePattern": "^_"
             }
         ]
-    }
+    },
+    "ignorePatterns": ["**.config.ts", ".gitignore", "node_modules/**/*", ".github", "cdk.out/**/*"]
 }

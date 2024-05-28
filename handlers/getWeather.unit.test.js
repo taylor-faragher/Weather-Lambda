@@ -1,9 +1,10 @@
-const { getWeather } = require('./getWeather'); 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const {getWeather} = require('./getWeather');
 
 global.fetch = jest.fn(() =>
     Promise.resolve({
-        json: () => Promise.resolve({weather: "sunny"}),
-        status: 200
+        json: () => Promise.resolve({weather: 'sunny'}),
+        status: 200,
     })
 );
 
@@ -15,29 +16,31 @@ describe('getWeather', () => {
     });
 
     it('should fetch weather data for default zip code when method called', async () => {
-        const mockData = { weather: "sunny" };
+        const mockData = {weather: 'sunny'};
 
         const result = await getWeather();
 
         expect(fetch).toHaveBeenCalledTimes(1);
         expect(fetch).toHaveBeenCalledWith(
-            "https://api.openweathermap.org/data/2.5/weather?zip=20005&appid=fake_api_key&units=imperial"
+            'https://api.openweathermap.org/data/2.5/weather?zip=20005&appid=fake_api_key&units=imperial'
         );
         expect(result).toEqual({
             statusCode: 200,
             body: JSON.stringify(mockData),
             headers: {
-                "Access-Control-Allow-Origin": "*",
-            }
+                'Access-Control-Allow-Origin': '*',
+            },
         });
     });
 
     it('should handle non-200 responses', async () => {
-        const mockData = { message: "city not found" };
-        fetch.mockImplementationOnce(() => Promise.resolve({
-            json: () => Promise.resolve({message: "city not found"}),
-            status: 404
-        }));
+        const mockData = {message: 'city not found'};
+        fetch.mockImplementationOnce(() =>
+            Promise.resolve({
+                json: () => Promise.resolve({message: 'city not found'}),
+                status: 404,
+            })
+        );
 
         const result = await getWeather();
 
@@ -52,7 +55,9 @@ describe('getWeather', () => {
         const consoleSpy = jest.spyOn(console, 'log');
         const result = await getWeather();
 
-        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("There was an error fetching the weather in the lambda:"));
+        expect(consoleSpy).toHaveBeenCalledWith(
+            expect.stringContaining('There was an error fetching the weather in the lambda:')
+        );
         expect(result).toBeUndefined();
         consoleSpy.mockRestore();
     });
