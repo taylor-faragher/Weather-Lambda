@@ -59,7 +59,7 @@ describe('taylorsweatherapi.com', () => {
             .get('/?zipcode=')
             .expect(400)
             .then(res => {
-                expect(res.body).toEqual('Bad Request. Please send correct data.');
+                expect(res.body.error).toEqual('Bad Request. Please send correct data.');
             })
             .catch(err => {
                 throw err;
@@ -71,7 +71,7 @@ describe('taylorsweatherapi.com', () => {
             .get('/?random=')
             .expect(400)
             .then(res => {
-                expect(res.body).toEqual('Bad Request. Please send correct data.');
+                expect(res.body.error).toEqual('Bad Request. Please send correct data.');
             })
             .catch(err => {
                 throw err;
@@ -83,7 +83,7 @@ describe('taylorsweatherapi.com', () => {
             .get('?city=Nashville&state=TN')
             .expect(200)
             .then(res => {
-                expect(res.body).toEqual('Not Implemented yet!');
+                expect(res.body.message).toEqual('Not Implemented yet!');
             })
             .catch(err => {
                 throw err;
@@ -95,7 +95,7 @@ describe('taylorsweatherapi.com', () => {
             .get('?city=Nashville')
             .expect(400)
             .then(res => {
-                expect(res.body).toEqual('Bad Request. Please send correct data.');
+                expect(res.body.error).toEqual('Bad Request. Please send correct data.');
             })
             .catch(err => {
                 throw err;
