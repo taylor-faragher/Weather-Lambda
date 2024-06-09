@@ -1,5 +1,5 @@
 import {App, Stack, StackProps, aws_route53_targets} from 'aws-cdk-lib';
-import {EndpointType, LambdaIntegration, RestApi, SecurityPolicy} from 'aws-cdk-lib/aws-apigateway';
+import {EndpointType, LambdaIntegration, Period, RestApi, SecurityPolicy} from 'aws-cdk-lib/aws-apigateway';
 import {NodejsFunction} from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as path from 'path';
@@ -44,6 +44,8 @@ export class WeatherByZipCodeStack extends Stack {
             restApiName: `${props.customConfig.restApiName}`,
             deployOptions: {
                 stageName: `${props.customConfig.env}`,
+                throttlingRateLimit: 0.33,
+                throttlingBurstLimit: 10,
             },
             endpointConfiguration: {
                 types: [EndpointType.REGIONAL],
@@ -59,7 +61,35 @@ export class WeatherByZipCodeStack extends Stack {
             },
         });
 
-        api.root.addMethod('GET', new LambdaIntegration(weather));
+        const usagePlan = api.addUsagePlan('WeatherUsagePlan', {
+            name: `WeatherLambdaUsagePlan-${props.customConfig.env}`,
+            throttle: {
+                rateLimit: 0.33,
+                burstLimit: 10,
+            },
+            quota: {
+                limit: 10000,
+                period: Period.MONTH,
+            },
+        });
+
+        const key = api.addApiKey(`WeatherApiKey-${props.customConfig.env}`);
+
+        const getWeather = api.root.addMethod('GET', new LambdaIntegration(weather), {apiKeyRequired: true});
+
+        usagePlan.addApiKey(key);
+        usagePlan.addApiStage({
+            stage: api.deploymentStage,
+            throttle: [
+                {
+                    method: getWeather,
+                    throttle: {
+                        rateLimit: 0.33,
+                        burstLimit: 10,
+                    },
+                },
+            ],
+        });
 
         new route53.ARecord(this, 'FullDomainARecord', {
             zone: hostedZone,
