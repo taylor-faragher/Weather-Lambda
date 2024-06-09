@@ -6,7 +6,6 @@ describe('taylorsweatherapi.com', () => {
         request(baseUrl)
             .get('/')
             .expect(200)
-            .set('x-api-key', 'cAi01PiBii9pG57YmeuPG51of4TtypnWanFovQMW')
             .end((err, res) => {
                 if (err) return done(err);
                 expect(res.body).toHaveProperty('coord');
@@ -25,7 +24,6 @@ describe('taylorsweatherapi.com', () => {
     it('GET with zipcode param returns weather for specific city', done => {
         request(baseUrl)
             .get('/?zipcode=37167')
-            .set('x-api-key', 'cAi01PiBii9pG57YmeuPG51of4TtypnWanFovQMW')
             .expect(200)
             .end((err, res) => {
                 if (err) return done(err);
@@ -44,7 +42,6 @@ describe('taylorsweatherapi.com', () => {
     it('GET with partial zipcode param returns a 404 city not found message', async () => {
         request(baseUrl)
             .get('/?zipcode=371')
-            .set('x-api-key', 'cAi01PiBii9pG57YmeuPG51of4TtypnWanFovQMW')
             .expect(404)
             .then(res => {
                 expect(res.body).toHaveProperty('cod');
@@ -60,7 +57,6 @@ describe('taylorsweatherapi.com', () => {
     it('GET with empty zipcode param returns a 400 bad request', async () => {
         request(baseUrl)
             .get('/?zipcode=')
-            .set('x-api-key', 'cAi01PiBii9pG57YmeuPG51of4TtypnWanFovQMW')
             .expect(400)
             .then(res => {
                 expect(res.body.error).toEqual('Bad Request. Please send correct data.');
@@ -73,7 +69,6 @@ describe('taylorsweatherapi.com', () => {
     it('GET with random param returns a 400 bad request', async () => {
         request(baseUrl)
             .get('/?random=')
-            .set('x-api-key', 'cAi01PiBii9pG57YmeuPG51of4TtypnWanFovQMW')
             .expect(400)
             .then(res => {
                 expect(res.body.error).toEqual('Bad Request. Please send correct data.');
@@ -86,7 +81,6 @@ describe('taylorsweatherapi.com', () => {
     it('GET with city and state params returns a 200 request with no weather', async () => {
         request(baseUrl)
             .get('?city=Nashville&state=TN')
-            .set('x-api-key', 'cAi01PiBii9pG57YmeuPG51of4TtypnWanFovQMW')
             .expect(200)
             .then(res => {
                 expect(res.body.message).toEqual('Not Implemented yet!');
@@ -99,7 +93,6 @@ describe('taylorsweatherapi.com', () => {
     it('GET with city params ONLY returns a 400 bad request', async () => {
         request(baseUrl)
             .get('?city=Nashville')
-            .set('x-api-key', 'cAi01PiBii9pG57YmeuPG51of4TtypnWanFovQMW')
             .expect(400)
             .then(res => {
                 expect(res.body.error).toEqual('Bad Request. Please send correct data.');
