@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+const mapper = require('./utils/mapWeatherData');
+
 exports.getWeather = async () => {
     const key = process.env.API_KEY;
     try {
@@ -8,9 +11,12 @@ exports.getWeather = async () => {
         if (!res.ok) {
             console.log(`OpenWeatherMap threw an error getting the weather: ${JSON.stringify(data)}`);
         } //allows me to see openweathermap errors in cloudwatch
+
+        const mappedData = mapper.mapWeatherData(data);
+
         return {
             statusCode: res.status,
-            body: JSON.stringify(data),
+            body: JSON.stringify(mappedData),
             headers: {
                 'Access-Control-Allow-Origin': '*',
             },
