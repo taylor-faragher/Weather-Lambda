@@ -1,5 +1,6 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+/* eslint-disable @typescript-eslint/no-var-requires */
 const {getWeatherByZipCode} = require('./getWeatherByZipCode');
+const mapper = require('./utils/mapWeatherData');
 
 global.fetch = jest.fn(() =>
     Promise.resolve({
@@ -8,57 +9,72 @@ global.fetch = jest.fn(() =>
     })
 );
 
+jest.mock('./utils/mapWeatherData');
+
 describe('getWeatherByZipCode', () => {
     beforeEach(() => {
         jest.clearAllMocks();
-        fetch.mockClear();
-        process.env.API_KEY = 'fake_api_key'; // Mocking the API_KEY environment variable
+        process.env.API_KEY = 'fake_api_key';
     });
 
-    it('should fetch weather data for a given zip code', async () => {
+    it('should return weather data when fetch is successful', async () => {
+        const mockZipCode = '20005';
         const mockData = {weather: 'sunny'};
+        const mockMappedData = {weather: 'mapped sunny'};
 
-        const result = await getWeatherByZipCode('90210');
+        fetch.mockResolvedValue({
+            ok: true,
+            status: 200,
+            json: jest.fn().mockResolvedValue(mockData),
+        });
 
-        expect(fetch).toHaveBeenCalledTimes(1);
+        mapper.mapWeatherData.mockReturnValue(mockMappedData);
+
+        const result = await getWeatherByZipCode(mockZipCode);
+
         expect(fetch).toHaveBeenCalledWith(
-            'https://api.openweathermap.org/data/2.5/weather?zip=90210&appid=fake_api_key&units=imperial'
+            `https://api.openweathermap.org/data/2.5/weather?zip=${mockZipCode}&appid=fake_api_key&units=imperial`
         );
+        expect(mapper.mapWeatherData).toHaveBeenCalledWith(mockData);
         expect(result).toEqual({
             statusCode: 200,
-            body: JSON.stringify(mockData),
+            body: JSON.stringify(mockMappedData),
             headers: {
                 'Access-Control-Allow-Origin': '*',
             },
         });
     });
 
-    it('should handle non-200 responses', async () => {
-        const mockData = {message: 'city not found'};
-        fetch.mockImplementationOnce(() =>
-            Promise.resolve({
-                json: () => Promise.resolve({message: 'city not found'}),
-                status: 404,
-            })
+    it('should log an error and not throw if fetch fails', async () => {
+        const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+        const mockZipCode = '20005';
+
+        fetch.mockRejectedValue(new Error('Fetch failed'));
+
+        await getWeatherByZipCode(mockZipCode);
+
+        expect(consoleLogSpy).toHaveBeenCalledWith(
+            'There was an error fetching the weather in the lambda: Error: Fetch failed'
         );
-
-        const result = await getWeatherByZipCode('00000');
-
-        expect(fetch).toHaveBeenCalledTimes(1);
-        expect(result.statusCode).toBe(404);
-        expect(result.body).toBe(JSON.stringify(mockData));
+        consoleLogSpy.mockRestore();
     });
 
-    it('should log an error if the fetch fails', async () => {
-        fetch.mockImplementationOnce(() => Promise.reject('Networking Error'));
+    it('should log an OpenWeatherMap error if the response is not ok', async () => {
+        const mockZipCode = '20005';
+        const mockData = {message: 'Not Found'};
+        const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
-        const consoleSpy = jest.spyOn(console, 'log');
-        const result = await getWeatherByZipCode('90210');
+        fetch.mockResolvedValue({
+            ok: false,
+            status: 404,
+            json: jest.fn().mockResolvedValue(mockData),
+        });
 
-        expect(consoleSpy).toHaveBeenCalledWith(
-            expect.stringContaining('There was an error fetching the weather in the lambda:')
+        await getWeatherByZipCode(mockZipCode);
+
+        expect(consoleLogSpy).toHaveBeenCalledWith(
+            'OpenWeatherMap threw an error getting the weather: {"message":"Not Found"}'
         );
-        expect(result).toBeUndefined();
-        consoleSpy.mockRestore();
+        consoleLogSpy.mockRestore();
     });
 });
