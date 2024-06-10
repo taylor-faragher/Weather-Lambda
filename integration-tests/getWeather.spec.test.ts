@@ -9,15 +9,26 @@ describe('taylorsweatherapi.com', () => {
             .expect(200)
             .end((err, res) => {
                 if (err) return done(err);
-                expect(res.body).toHaveProperty('coord');
+                expect(res.body).toHaveProperty('coordinates');
+                expect(res.body.coordinates).toHaveProperty('lon');
+                expect(res.body.coordinates).toHaveProperty('lat');
                 expect(res.body).toHaveProperty('weather');
-                expect(res.body).toHaveProperty('base');
-                expect(res.body).toHaveProperty('main');
-                expect(res.body).toHaveProperty('visibility');
-                expect(res.body).toHaveProperty('wind');
-                expect(res.body).toHaveProperty('name');
-                expect(res.body.name).toEqual('Washington');
-                expect(res.body).toHaveProperty('timezone');
+                expect(res.body.weather).toHaveProperty('description');
+                expect(res.body.weather).toHaveProperty('icon');
+                expect(res.body.weather).toHaveProperty('temperature');
+                expect(res.body.weather).toHaveProperty('feelsLike');
+                expect(res.body.weather).toHaveProperty('pressure');
+                expect(res.body.weather).toHaveProperty('humidity');
+                expect(res.body.weather).toHaveProperty('visibility');
+                expect(res.body.weather).toHaveProperty('windSpeed');
+                expect(res.body.weather).toHaveProperty('windDirection');
+                expect(res.body).toHaveProperty('area');
+                expect(res.body.area).toHaveProperty('country');
+                expect(res.body.area).toHaveProperty('sunrise');
+                expect(res.body.area).toHaveProperty('sunset');
+                expect(res.body.area).toHaveProperty('timezone');
+                expect(res.body.area).toHaveProperty('majorCity');
+                expect(res.body.area.majorCity).toEqual('Washington');
                 return done();
             });
     });
@@ -29,14 +40,26 @@ describe('taylorsweatherapi.com', () => {
             .expect(200)
             .end((err, res) => {
                 if (err) return done(err);
-                expect(res.body).toHaveProperty('coord');
+                expect(res.body).toHaveProperty('coordinates');
+                expect(res.body.coordinates).toHaveProperty('lon');
+                expect(res.body.coordinates).toHaveProperty('lat');
                 expect(res.body).toHaveProperty('weather');
-                expect(res.body).toHaveProperty('base');
-                expect(res.body).toHaveProperty('main');
-                expect(res.body).toHaveProperty('visibility');
-                expect(res.body).toHaveProperty('wind');
-                expect(res.body.name).toEqual('Smyrna');
-                expect(res.body).toHaveProperty('timezone');
+                expect(res.body.weather).toHaveProperty('description');
+                expect(res.body.weather).toHaveProperty('icon');
+                expect(res.body.weather).toHaveProperty('temperature');
+                expect(res.body.weather).toHaveProperty('feelsLike');
+                expect(res.body.weather).toHaveProperty('pressure');
+                expect(res.body.weather).toHaveProperty('humidity');
+                expect(res.body.weather).toHaveProperty('visibility');
+                expect(res.body.weather).toHaveProperty('windSpeed');
+                expect(res.body.weather).toHaveProperty('windDirection');
+                expect(res.body).toHaveProperty('area');
+                expect(res.body.area).toHaveProperty('country');
+                expect(res.body.area).toHaveProperty('sunrise');
+                expect(res.body.area).toHaveProperty('sunset');
+                expect(res.body.area).toHaveProperty('timezone');
+                expect(res.body.area).toHaveProperty('majorCity');
+                expect(res.body.area.majorCity).toEqual('Smyrna');
                 return done();
             });
     });
