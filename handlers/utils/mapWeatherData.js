@@ -1,30 +1,29 @@
-exports.mapWeatherData = data => {
+import mapHourlyData from './mapHourlyData.js';
+import mapDailyData from './mapDailyData.js';
+import mapCurrentData from './mapCurrentData.js';
+
+const mapWeatherData = async data => {
     if (!data) {
         return;
     }
+    const mappedHourlyData = await mapHourlyData(data.hourly, data.timezone_offset);
+    const mappedDailyData = await mapDailyData(data.daily, data.timezone_offset);
+    const mappedCurrentData = await mapCurrentData(data);
+
     const mappedData = {
         coordinates: {
-            lon: data.coord.lon,
-            lat: data.coord.lat,
+            lon: data.lon,
+            lat: data.lat,
         },
-        weather: {
-            description: data.weather[0].description,
-            icon: data.weather[0].icon,
-            temperature: data.main.temp,
-            feelsLike: data.main.feels_like,
-            pressure: data.main.pressure,
-            humidity: data.main.humidity,
-            visibility: data.visibility,
-            windSpeed: data.wind.speed,
-            windDirection: data.wind.deg,
-        },
+        current: mappedCurrentData,
+        hourly: mappedHourlyData,
+        daily: mappedDailyData,
         area: {
-            country: data.sys.country,
-            sunrise: data.sys.sunrise,
-            sunset: data.sys.sunset,
             timezone: data.timezone,
-            majorCity: data.name,
         },
     };
+
     return mappedData;
 };
+
+module.exports = {mapWeatherData};
