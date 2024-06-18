@@ -1,6 +1,6 @@
-import {mapWeatherData} from './utils/mapWeatherData';
+import mapWeatherData from './utils/mapWeatherData';
 
-export async function getWeatherByZipCode(zipCode) {
+const getWeatherByZipCode = async zipCode => {
     const key = process.env.API_KEY;
     try {
         const geolocationResponse = await fetch(
@@ -42,4 +42,6 @@ export async function getWeatherByZipCode(zipCode) {
     } catch (error) {
         console.log(`There was an error fetching the weather in the lambda: ${error}`);
     }
-}
+};
+
+export default getWeatherByZipCode;
