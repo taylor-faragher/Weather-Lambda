@@ -26,4 +26,4 @@ const mapWeatherData = async data => {
     return mappedData;
 };
 
-module.exports = {mapWeatherData};
+export default mapWeatherData;
