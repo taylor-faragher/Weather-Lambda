@@ -24,9 +24,7 @@ export async function getWeatherByZipCode(zipCode) {
             console.log(`OpenWeatherMap threw an error getting the weather`);
             return {
                 statusCode: geolocationResponse.status !== 200 ? geolocationResponse.status : oneCall.status,
-                body: JSON.stringify({
-                    message: `OpenWeatherMap threw an error getting the weather: ${JSON.stringify(oneCallData)}`,
-                }),
+                body: geolocationResponse.status !== 200 ? JSON.stringify(data) : JSON.stringify(oneCallData),
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                 },
