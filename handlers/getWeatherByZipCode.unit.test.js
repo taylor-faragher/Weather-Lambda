@@ -1,5 +1,5 @@
-import {getWeatherByZipCode} from './getWeatherByZipCode';
-import {mapWeatherData} from './utils/mapWeatherData';
+import getWeatherByZipCode from './getWeatherByZipCode';
+import mapWeatherData from './utils/mapWeatherData';
 
 jest.mock('./utils/mapWeatherData');
 
