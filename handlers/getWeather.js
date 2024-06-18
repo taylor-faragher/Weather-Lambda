@@ -1,27 +1,34 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-const mapper = require('./utils/mapWeatherData');
+import {mapWeatherData} from './utils/mapWeatherData';
 
-exports.getWeather = async () => {
+export async function getWeather() {
     const key = process.env.API_KEY;
     try {
-        const res = await fetch(
-            `https://api.openweathermap.org/data/2.5/weather?zip=20005&appid=${key}&units=imperial`
+        const oneCall = await fetch(
+            `https://api.openweathermap.org/data/3.0/onecall?lat=38.9067&lon=-77.0312&exclude=minutely&appid=${key}&units=imperial`
         );
-        const data = await res.json();
-        if (!res.ok) {
-            console.log(`OpenWeatherMap threw an error getting the weather: ${JSON.stringify(data)}`);
-        } //allows me to see openweathermap errors in cloudwatch
+        const oneCallData = await oneCall.json();
 
-        const mappedData = mapper.mapWeatherData(data);
-
-        return {
-            statusCode: res.status,
-            body: JSON.stringify(mappedData),
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-            },
-        };
+        if (oneCall.status !== 200) {
+            //allows me to see openweathermap errors in cloudwatch
+            console.log(`OpenWeatherMap threw an error getting the weather: ${JSON.stringify(oneCallData)}`);
+            return {
+                statusCode: oneCall.status,
+                body: JSON.stringify(oneCallData),
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                },
+            };
+        } else {
+            const mappedData = await mapWeatherData(oneCallData);
+            return {
+                statusCode: oneCall.status,
+                body: JSON.stringify(mappedData),
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                },
+            };
+        }
     } catch (error) {
-        console.log(`There was an error fetching the weather in the lambda: ${error.message}`);
+        console.log(`There was an error fetching the weather in the lambda: ${error}`);
     }
-};
+}
