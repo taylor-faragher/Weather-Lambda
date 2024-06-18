@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-const weatherService = require('./getWeather');
-const weatherByZipCodeService = require('./getWeatherByZipCode');
+import getWeather from './getWeather';
+import getWeatherByZipCode from './getWeatherByZipCode';
 
-exports.handler = async function (event) {
+export const handler = async event => {
     let operation;
     let zipCode;
     let result;
@@ -35,12 +34,12 @@ exports.handler = async function (event) {
 
     switch (operation) {
         case 'weather': {
-            result = await weatherService.getWeather();
+            result = await getWeather();
             break;
         }
         case 'zipCode': {
             console.log('zipCode: ', zipCode);
-            result = await weatherByZipCodeService.getWeatherByZipCode(zipCode.toString());
+            result = await getWeatherByZipCode(zipCode.toString());
             break;
         }
         case 'cityLookup': {
