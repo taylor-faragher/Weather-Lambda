@@ -1,6 +1,6 @@
-import {mapWeatherData} from './utils/mapWeatherData';
+import mapWeatherData from './utils/mapWeatherData';
 
-export async function getWeather() {
+const getWeather = async () => {
     const key = process.env.API_KEY;
     try {
         const oneCall = await fetch(
@@ -31,4 +31,6 @@ export async function getWeather() {
     } catch (error) {
         console.log(`There was an error fetching the weather in the lambda: ${error}`);
     }
-}
+};
+
+export default getWeather;
