@@ -72,7 +72,7 @@ describe('getWeatherByZipCode', () => {
         expect(consoleLogSpy).toHaveBeenCalledWith(expectedMessage);
         expect(result).toEqual({
             statusCode: 404,
-            body: JSON.stringify({message: `OpenWeatherMap threw an error getting the weather: {}`}),
+            body: JSON.stringify({message: 'Not Found'}),
             headers: {
                 'Access-Control-Allow-Origin': '*',
             },
@@ -105,9 +105,7 @@ describe('getWeatherByZipCode', () => {
         expect(consoleLogSpy).toHaveBeenCalledWith(expectedMessage);
         expect(result).toEqual({
             statusCode: 404,
-            body: JSON.stringify({
-                message: `OpenWeatherMap threw an error getting the weather: {"message":"Not Found"}`,
-            }),
+            body: JSON.stringify({message: 'Not Found'}),
             headers: {
                 'Access-Control-Allow-Origin': '*',
             },
