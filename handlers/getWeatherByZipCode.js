@@ -10,17 +10,23 @@ export async function getWeatherByZipCode(zipCode) {
         const lat = data.lat;
         const lon = data.lon;
 
-        const oneCall = await fetch(
-            `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=minutely&appid=${key}&units=imperial`
-        );
-        const oneCallData = await oneCall.json();
+        let oneCallData = {};
+        let oneCall;
+        if (geolocationResponse.status == 200) {
+            oneCall = await fetch(
+                `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=minutely&appid=${key}&units=imperial`
+            );
+            oneCallData = await oneCall.json();
+        }
 
         if (geolocationResponse.status !== 200 || oneCall.status !== 200) {
             //allows me to see openweathermap errors in cloudwatch
-            console.log(`OpenWeatherMap threw an error getting the weather: ${JSON.stringify(data)}`);
+            console.log(`OpenWeatherMap threw an error getting the weather`);
             return {
-                statusCode: geolocationResponse.status,
-                body: JSON.stringify(data),
+                statusCode: geolocationResponse.status !== 200 ? geolocationResponse.status : oneCall.status,
+                body: JSON.stringify({
+                    message: `OpenWeatherMap threw an error getting the weather: ${JSON.stringify(oneCallData)}`,
+                }),
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                 },
