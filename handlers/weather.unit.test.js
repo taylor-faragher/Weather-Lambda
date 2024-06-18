@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-const {handler} = require('./weather');
-const weatherService = require('./getWeather');
-const weatherByZipCodeService = require('./getWeatherByZipCode');
+import {handler} from './weather';
+import getWeatherByZipCode from './getWeatherByZipCode';
+import getWeather from './getWeather';
 
 jest.mock('./getWeather');
 jest.mock('./getWeatherByZipCode');
@@ -13,21 +12,21 @@ describe('Weather Handler Tests', () => {
 
     it('fetches default Washington DC weather when no parameters are given', async () => {
         const event = {};
-        weatherService.getWeather.mockResolvedValue('default weather data');
+        getWeather.mockResolvedValue('default weather data');
 
         const result = await handler(event);
 
-        expect(weatherService.getWeather).toHaveBeenCalled();
+        expect(getWeather).toHaveBeenCalled();
         expect(result).toBe('default weather data');
     });
 
     it('fetches weather by zipcode', async () => {
         const event = {queryStringParameters: {zipcode: '10001'}};
-        weatherByZipCodeService.getWeatherByZipCode.mockResolvedValue('weather data by zip code');
+        getWeatherByZipCode.mockResolvedValue('weather data by zip code');
 
         const result = await handler(event);
 
-        expect(weatherByZipCodeService.getWeatherByZipCode).toHaveBeenCalledWith('10001');
+        expect(getWeatherByZipCode).toHaveBeenCalledWith('10001');
         expect(result).toBe('weather data by zip code');
     });
 
