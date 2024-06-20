@@ -2,7 +2,7 @@ import mapHourlyData from './mapHourlyData.js';
 import mapDailyData from './mapDailyData.js';
 import mapCurrentData from './mapCurrentData.js';
 
-const mapWeatherData = async data => {
+const mapWeatherData = async (data, city = 'Washington') => {
     if (!data) {
         return;
     }
@@ -20,6 +20,7 @@ const mapWeatherData = async data => {
         daily: mappedDailyData,
         area: {
             timezone: data.timezone,
+            majorCity: city,
         },
     };
 
