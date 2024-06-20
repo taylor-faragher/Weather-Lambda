@@ -9,6 +9,7 @@ const getWeatherByZipCode = async zipCode => {
         const data = await geolocationResponse.json();
         const lat = data.lat;
         const lon = data.lon;
+        const city = data.name;
 
         let oneCallData = {};
         let oneCall;
@@ -30,7 +31,7 @@ const getWeatherByZipCode = async zipCode => {
                 },
             };
         } else {
-            const mappedData = await mapWeatherData(oneCallData);
+            const mappedData = await mapWeatherData(oneCallData, city);
             return {
                 statusCode: oneCall.status,
                 body: JSON.stringify(mappedData),
