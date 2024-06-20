@@ -43,6 +43,7 @@ describe('taylorsweatherapi.com', () => {
                 expect(res.body.daily[0]).toHaveProperty('sunset');
                 expect(res.body).toHaveProperty('area');
                 expect(res.body.area).toHaveProperty('timezone');
+                expect(res.body.area).toHaveProperty('majorCity');
                 return done();
             });
     });
@@ -88,6 +89,7 @@ describe('taylorsweatherapi.com', () => {
                 expect(res.body.daily[0]).toHaveProperty('sunset');
                 expect(res.body).toHaveProperty('area');
                 expect(res.body.area).toHaveProperty('timezone');
+                expect(res.body.area).toHaveProperty('majorCity');
                 return done();
             });
     });
