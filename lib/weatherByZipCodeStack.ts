@@ -1,5 +1,12 @@
 import {App, Stack, StackProps, aws_route53_targets} from 'aws-cdk-lib';
-import {EndpointType, LambdaIntegration, Period, RestApi, SecurityPolicy} from 'aws-cdk-lib/aws-apigateway';
+import {
+    EndpointType,
+    LambdaIntegration,
+    Period,
+    RestApi,
+    SecurityPolicy,
+    TokenAuthorizer,
+} from 'aws-cdk-lib/aws-apigateway';
 import {NodejsFunction} from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as path from 'path';
@@ -16,9 +23,14 @@ export class WeatherByZipCodeStack extends Stack {
         super(scope, id, props);
 
         const openWeatherId = process.env.OPEN_WEATHER_API_ID;
+        const jwksUriId = process.env.JWKS_URI_ID;
 
         const decryptedApiKey = getSecretByArn(this, 'openWeatherKey', {
             secretCompleteArn: `arn:aws:secretsmanager:us-east-1:${props?.env?.account}:secret:${openWeatherId}`,
+        });
+
+        const decryptedUri = getSecretByArn(this, 'decryptedUri', {
+            secretCompleteArn: `arn:aws:secretsmanager:us-east-1:${props?.env?.account}:secret:${jwksUriId}`,
         });
 
         const weather = new NodejsFunction(this, 'WeatherByZipCodeGetHandler', {
@@ -26,6 +38,26 @@ export class WeatherByZipCodeStack extends Stack {
             runtime: Runtime.NODEJS_18_X,
             handler: 'index.handler',
             entry: path.join(__dirname, `/../handlers/weather.js`),
+            environment: {
+                API_KEY: `${decryptedApiKey}`,
+            },
+        });
+
+        const authorizer = new NodejsFunction(this, 'GetWeatherAuthorizerHandler', {
+            functionName: 'GetWeatherPremiumAuthorizer',
+            runtime: Runtime.NODEJS_18_X,
+            handler: 'authorizer',
+            entry: path.join(__dirname, `/../handlers/authorizer/handler.js`),
+            environment: {
+                JWKS_URI: decryptedUri,
+            },
+        });
+
+        const premiumWeather = new NodejsFunction(this, 'WeatherByZipCodePremiumGetHandler', {
+            functionName: 'GetPremiumWeather',
+            runtime: Runtime.NODEJS_18_X,
+            handler: 'index.getWeather',
+            entry: path.join(__dirname, `/../handlers/getWeather.js`),
             environment: {
                 API_KEY: `${decryptedApiKey}`,
             },
@@ -59,6 +91,10 @@ export class WeatherByZipCodeStack extends Stack {
             },
         });
 
+        const tokenAuthorizer = new TokenAuthorizer(this, 'GetWeatherTokenAuthorizer', {
+            handler: authorizer,
+        });
+
         const usagePlan = api.addUsagePlan('WeatherUsagePlan', {
             name: `WeatherLambdaUsagePlan-${props.customConfig.env}`,
             throttle: {
@@ -74,6 +110,10 @@ export class WeatherByZipCodeStack extends Stack {
         const key = api.addApiKey(`WeatherApiKey-${props.customConfig.env}`);
 
         const getWeather = api.root.addMethod('GET', new LambdaIntegration(weather), {apiKeyRequired: true});
+        const premium = api.root.addResource('premium');
+        premium.addMethod('GET', new LambdaIntegration(premiumWeather), {
+            authorizer: tokenAuthorizer,
+        });
 
         usagePlan.addApiKey(key);
         usagePlan.addApiStage({
