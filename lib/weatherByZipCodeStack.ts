@@ -33,11 +33,11 @@ export class WeatherByZipCodeStack extends Stack {
             secretCompleteArn: `arn:aws:secretsmanager:us-east-1:${props?.env?.account}:secret:${jwksUriId}`,
         });
 
-        const weather = new NodejsFunction(this, 'WeatherByZipCodeGetHandler', {
+        const weather = new NodejsFunction(this, 'getWeatherFreemiumGetHandler', {
             functionName: `${props.customConfig.lambdaFunctionName}`,
             runtime: Runtime.NODEJS_18_X,
-            handler: 'index.handler',
-            entry: path.join(__dirname, `/../handlers/weather.js`),
+            handler: 'index.getWeatherFreemium',
+            entry: path.join(__dirname, `/../handlers/getWeatherFreemium.js`),
             environment: {
                 API_KEY: `${decryptedApiKey}`,
             },
@@ -53,11 +53,11 @@ export class WeatherByZipCodeStack extends Stack {
             },
         });
 
-        const premiumWeather = new NodejsFunction(this, 'WeatherByZipCodePremiumGetHandler', {
-            functionName: 'GetPremiumWeather',
+        const premiumWeather = new NodejsFunction(this, 'getWeatherPremiumGetHandler', {
+            functionName: 'GetWeatherPremiumDevHandler',
             runtime: Runtime.NODEJS_18_X,
-            handler: 'index.getWeather',
-            entry: path.join(__dirname, `/../handlers/getWeather.js`),
+            handler: 'index.getWeatherPremium',
+            entry: path.join(__dirname, `/../handlers/getWeatherPremium.js`),
             environment: {
                 API_KEY: `${decryptedApiKey}`,
             },
