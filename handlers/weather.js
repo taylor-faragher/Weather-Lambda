@@ -1,4 +1,3 @@
-import getWeather from './getWeather';
 import getWeatherByZipCode from './getWeatherByZipCode';
 
 export const handler = async event => {
@@ -34,7 +33,7 @@ export const handler = async event => {
 
     switch (operation) {
         case 'weather': {
-            result = await getWeather();
+            result = await getWeatherByZipCode('20005');
             break;
         }
         case 'zipCode': {
