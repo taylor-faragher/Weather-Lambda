@@ -10,7 +10,7 @@ export const authorizer = async event => {
         const decodedToken = decodeToken(token);
         const key = await authorizerClient.getSigningKey(decodedToken.header.kid);
         try {
-            const verifiedToken = verifyToken(token, key.rsaPublicKey);
+            const verifiedToken = verifyToken(token, key.getPublicKey());
             return {
                 policyDocument: generatePolicy('Allow', '*'),
                 principalId: verifiedToken.payload.sub,
