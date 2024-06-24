@@ -16,6 +16,7 @@
     "local": "lambda-local -l handlers/weather.js -h handler --watch 8008"
   },
   "devDependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.600.0",
     "@aws-sdk/client-secrets-manager": "^3.578.0",
     "@types/aws-lambda": "^8.10.138",
     "@types/jest": "^29.5.12",
