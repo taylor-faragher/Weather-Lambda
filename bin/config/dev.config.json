@@ -3,6 +3,8 @@
     "region": "us-east-1",
     "domain": "taylorsweatherapi.com",
     "fullDomain": "dev.taylorsweatherapi.com",
-    "lambdaFunctionName": "GetWeatherFreemiumDevHandler",
+    "lambdaFreemiumFunctionName": "GetWeatherFreemiumDevHandler",
+    "lambdaPremiumFunctionName": "GetWeatherPremiumDevHandler",
+    "lambdaAuthorizerName": "GetWeatherPremiumDevAuthorizer",
     "restApiName": "GetWeatherApiDev"
 }
