@@ -3,6 +3,8 @@
     "region": "us-east-1",
     "domain": "taylorsweatherapi.com",
     "fullDomain": "api.taylorsweatherapi.com",
-    "lambdaFunctionName": "GetWeatherByZipCodeProdHandler",
-    "restApiName": "GetWeatherByZipCodeApiProd"
+    "lambdaFreemiumFunctionName": "GetWeatherFreemiumProdHandler",
+    "lambdaPremiumFunctionName": "GetWeatherPremiumProdHandler",
+    "lambdaAuthorizerName": "GetWeatherPremiumProdAuthorizer",
+    "restApiName": "GetWeatherApiProd"
 }
