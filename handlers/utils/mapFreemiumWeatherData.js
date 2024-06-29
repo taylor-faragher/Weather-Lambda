@@ -9,7 +9,7 @@ const mapFreemiumWeatherData = async (data, city = 'Washington') => {
             lat: data.lat,
         },
         current: {
-            temperature: data.current.temp,
+            temperature: Math.round(data.current.temp),
             icon: data.current.weather[0].icon,
             description: data.current.weather[0].description,
         },
