@@ -30,13 +30,13 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           registry-url: 'https://npm.pkg.github.com'
           always-auth: true
           cache: yarn
           cache-dependency-path: '**/yarn.lock'
         env:
-          AWS_ACCOUNT_NUMBER: ${{ secrets.AWS_ACCOUNT_NUMBER }}
+          AWS_ACCOUNT_NUMBER: ${{ env.AWS_ACCOUNT_NUMBER }}
           AWS_REGION: us-east-1
 
       - name: Install Dependencies
@@ -46,7 +46,7 @@ jobs:
         run: yarn add aws-cdk
       
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v3
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_NUMBER }}:role/GithubActionsProvider
           role-session-name: prodDeployment
