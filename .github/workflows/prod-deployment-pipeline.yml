@@ -57,6 +57,9 @@ jobs:
 
       - name : Run Integration Tests
         run: yarn integration
+        env:
+          AWS_ACCOUNT_NUMBER: ${{ env.AWS_ACCOUNT_NUMBER }}
+          AWS_REGION: us-east-1
 
       - name: Deploy Prod
         shell: bash
