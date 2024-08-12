@@ -10,6 +10,7 @@ env:
   AWS_REGION : 'us-east-1'
   AWS_ACCOUNT_NUMBER: ${{ secrets.AWS_ACCOUNT_NUMBER }}
   OPEN_WEATHER_API_ID: ${{ secrets.OPEN_WEATHER_API_ID }}
+  JWKS_URI_ID: ${{ secrets.JWKS_URI_ID }}
 
 permissions:
   contents: read
