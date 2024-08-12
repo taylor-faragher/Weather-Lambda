@@ -35,7 +35,7 @@ export class WeatherByZipCodeStack extends Stack {
 
         const weather = new NodejsFunction(this, 'getWeatherFreemiumGetHandler', {
             functionName: `${props.customConfig.lambdaFreemiumFunctionName}`,
-            runtime: Runtime.NODEJS_18_X,
+            runtime: Runtime.NODEJS_20_X,
             handler: 'index.getWeatherFreemium',
             entry: path.join(__dirname, `/../handlers/getWeatherFreemium.js`),
             environment: {
@@ -45,7 +45,7 @@ export class WeatherByZipCodeStack extends Stack {
 
         const authorizer = new NodejsFunction(this, 'GetWeatherAuthorizerHandler', {
             functionName: `${props.customConfig.lambdaAuthorizerName}`,
-            runtime: Runtime.NODEJS_18_X,
+            runtime: Runtime.NODEJS_20_X,
             handler: 'authorizer',
             entry: path.join(__dirname, `/../handlers/authorizer/handler.js`),
             environment: {
@@ -55,7 +55,7 @@ export class WeatherByZipCodeStack extends Stack {
 
         const premiumWeather = new NodejsFunction(this, 'getWeatherPremiumGetHandler', {
             functionName: `${props.customConfig.lambdaPremiumFunctionName}`,
-            runtime: Runtime.NODEJS_18_X,
+            runtime: Runtime.NODEJS_20_X,
             handler: 'index.getWeatherPremium',
             entry: path.join(__dirname, `/../handlers/getWeatherPremium.js`),
             environment: {
