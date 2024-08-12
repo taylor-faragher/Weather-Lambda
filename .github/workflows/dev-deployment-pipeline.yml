@@ -9,6 +9,7 @@ env:
   AWS_REGION : 'us-east-1'
   AWS_ACCOUNT_NUMBER: ${{ secrets.AWS_ACCOUNT_NUMBER }}
   OPEN_WEATHER_API_ID: ${{ secrets.OPEN_WEATHER_API_ID }}
+  JWKS_URI_ID: ${{ secrets.JWKS_URI_ID }}
 
 permissions:
   contents: read
@@ -29,7 +30,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           registry-url: 'https://npm.pkg.github.com'
           always-auth: true
           cache: yarn
@@ -42,19 +43,21 @@ jobs:
 
       - name: Install AWS CDK
         run: yarn add aws-cdk
-      
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_NUMBER }}:role/GithubActionsProvider
+          aws-region: us-east-1
+
       - name: Run Unit Tests
         run: yarn test
 
       - name: Run Integration Tests
         run: yarn integration
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v3
-        with:
-          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_NUMBER }}:role/GithubActionsProvider
-          role-session-name: devDeployment
-          aws-region: us-east-1
+        env:
+          AWS_ACCOUNT_NUMBER: ${{ env.AWS_ACCOUNT_NUMBER }}
+          AWS_REGION: us-east-1
 
       - name: Deploy Dev
         shell: bash
