@@ -45,18 +45,18 @@ jobs:
       - name: Install AWS CDK
         run: yarn add aws-cdk
       
-      - name : Run Unit Tests
-        run: yarn test
-
-      - name : Run Integration Tests
-        run: yarn integration
-
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
           role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT_NUMBER }}:role/GithubActionsProvider
           role-session-name: prodDeployment
           aws-region: us-east-1
+      
+      - name : Run Unit Tests
+        run: yarn test
+
+      - name : Run Integration Tests
+        run: yarn integration
 
       - name: Deploy Prod
         shell: bash
