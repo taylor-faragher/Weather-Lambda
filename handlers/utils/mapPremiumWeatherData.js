@@ -1,10 +1,12 @@
 import mapHourlyData from './mapHourlyData.js';
 import mapDailyData from './mapDailyData.js';
 import mapCurrentData from './mapCurrentData.js';
+import logger from './logger';
 
 const mapPremiumWeatherData = async (data, city = 'Washington') => {
     if (!data) {
-        return;
+        logger.error('No data received for mapping');
+        throw new Error('No data received for mapping');
     }
     const mappedHourlyData = await mapHourlyData(data.hourly, data.timezone_offset);
     const mappedDailyData = await mapDailyData(data.daily, data.timezone_offset);

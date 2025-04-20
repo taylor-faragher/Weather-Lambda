@@ -1,6 +1,9 @@
+import logger from './logger';
+
 const mapFreemiumWeatherData = async (data, city = 'Washington') => {
     if (!data) {
-        return;
+        logger.error('No data received for mapping');
+        throw new Error('No data received for mapping');
     }
 
     const mappedData = {
