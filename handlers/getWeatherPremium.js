@@ -1,14 +1,30 @@
 import mapPremiumWeatherData from './utils/mapPremiumWeatherData';
+import logger from './utils/logger';
 
 export const getWeatherPremium = async event => {
     let zipCode;
 
+    logger.info('Lettuce Begin...:', {event});
+
     if (event.queryStringParameters && event.queryStringParameters.zipcode) {
         const zipCodeParam = event.queryStringParameters.zipcode;
         zipCode = zipCodeParam.toString();
+        logger.info('Got the zipcode: ', zipCode);
+        if (zipCode.length !== 5) {
+            logger.warn('You are coming up short bud. Zipcode is not 5 digits.', {event});
+            logger.warn('Here some bad data: ', zipCode);
+            return {
+                statusCode: 404,
+                body: JSON.stringify({error: 'Bad Request. Please send correct data.'}),
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                },
+            };
+        }
     } else if (!event.queryStringParameters) {
         zipCode = '20005';
     } else {
+        logger.warn('Danger Will Robinson! No zipcode provided.', {event});
         return {
             statusCode: 400,
             body: JSON.stringify({error: 'Bad Request. Please send correct data.'}),
@@ -18,46 +34,70 @@ export const getWeatherPremium = async event => {
         };
     }
 
+    logger.info('Got the location: ', zipCode);
+
     const key = process.env.API_KEY;
+    let data = {};
     try {
-        const geolocationResponse = await fetch(
-            `http://api.openweathermap.org/geo/1.0/zip?zip=${zipCode},US&appid=${key}`
-        );
-        const data = await geolocationResponse.json();
+        try {
+            const geolocationResponse = await fetch(
+                `http://api.openweathermap.org/geo/1.0/zip?zip=${zipCode},US&appid=${key}`
+            );
+            data = await geolocationResponse.json();
+        } catch (error) {
+            logger.error('Failed to get geolocation data. Bummer! Here is the error from openweathermap: ', error);
+            return {
+                statusCode: 500,
+                body: JSON.stringify({error: 'Error in Geolocation. Please try again later.'}),
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                },
+            };
+        }
+
+        logger.info('Got the geolocation data: ', data);
+
         const lat = data.lat;
         const lon = data.lon;
         const city = data.name;
 
         let oneCallData = {};
         let oneCall;
-        if (geolocationResponse.status == 200) {
+        try {
             oneCall = await fetch(
                 `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=minutely&appid=${key}&units=imperial`
             );
             oneCallData = await oneCall.json();
+        } catch (error) {
+            logger.error('Failed to get one call data. Bummer! Here is the error from openweathermap: ', error);
+            return {
+                statusCode: 500,
+                body: JSON.stringify({error: 'Error in Weather Call. Please try again later.'}),
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                },
+            };
         }
+        logger.info('Got the one call data. Sweet! Check it: ', oneCallData);
 
-        if (geolocationResponse.status !== 200 || oneCall.status !== 200) {
-            //allows me to see openweathermap errors in cloudwatch
-            console.log(`OpenWeatherMap threw an error getting the weather`);
-            return {
-                statusCode: geolocationResponse.status !== 200 ? geolocationResponse.status : oneCall.status,
-                body: geolocationResponse.status !== 200 ? JSON.stringify(data) : JSON.stringify(oneCallData),
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                },
-            };
-        } else {
-            const mappedData = await mapPremiumWeatherData(oneCallData, city);
-            return {
-                statusCode: oneCall.status,
-                body: JSON.stringify(mappedData),
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                },
-            };
-        }
+        const mappedData = await mapPremiumWeatherData(oneCallData, city);
+
+        logger.info('It has been quite a journey. Here is our reward: ', mappedData);
+        return {
+            statusCode: oneCall.status,
+            body: JSON.stringify(mappedData),
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+            },
+        };
     } catch (error) {
-        console.log(`There was an error fetching the weather in the lambda: ${error}`);
+        logger.error('Error in getWeatherPremium: ', error);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({error: 'Internal Error in Premium Endpoint. Please try again later.'}),
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+            },
+        };
     }
 };
