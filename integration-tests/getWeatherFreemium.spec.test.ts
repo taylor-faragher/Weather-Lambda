@@ -76,10 +76,8 @@ describe('taylorsweatherapi.com - Fremium', () => {
             .set('x-api-key', 'uFaywcvpQj94HeeNC8ESd3w5eSS8NcxKaILjvkVq')
             .expect(404)
             .then(res => {
-                expect(res.body).toHaveProperty('cod');
-                expect(res.body.cod).toEqual('404');
-                expect(res.body).toHaveProperty('message');
-                expect(res.body.message).toEqual('not found');
+                expect(res.body).toHaveProperty('error');
+                expect(res.body.error).toEqual('Bad Request. Please send correct data.');
             })
             .catch(err => {
                 throw err;
