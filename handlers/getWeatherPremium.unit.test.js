@@ -3,92 +3,167 @@ import mapPremiumWeatherData from './utils/mapPremiumWeatherData';
 
 jest.mock('./utils/mapPremiumWeatherData');
 
-describe('getWeatherPremium', () => {
+describe('getPremiumWeather', () => {
     const API_KEY = 'test-api-key';
-
-    beforeEach(() => {
-        jest.clearAllMocks();
-        process.env.API_KEY = 'test-api-key';
-        global.fetch = jest.fn();
-    });
+    const MOCK_GEOLOCATION_DATA = {lat: 38.9072, lon: -77.0369, name: 'Washington'};
+    const MOCK_WEATHER_DATA = {
+        current: {temp: 70},
+        daily: [],
+        hourly: [],
+    };
+    const MAPPED_DATA = {temperature: 70};
+    const mockCity = 'Washington';
 
     beforeAll(() => {
         process.env.API_KEY = API_KEY;
     });
 
-    it('should use default zip code if queryStringParameters are missing', async () => {
-        fetch.mockResolvedValueOnce(
-            new Response(JSON.stringify({lat: 38.9067, lon: -77.0312, name: 'Washington'}), {status: 200})
-        );
-        fetch.mockResolvedValueOnce(new Response(JSON.stringify({weather: 'data'}), {status: 200}));
-        mapPremiumWeatherData.mockResolvedValueOnce({mapped: 'data'});
+    beforeEach(() => {
+        jest.clearAllMocks();
+        // Mock fetch differently for geolocation and onecall APIs
+        global.fetch = jest.fn(url => {
+            if (url.includes('api.openweathermap.org/geo/1.0/zip')) {
+                return Promise.resolve({
+                    json: () => Promise.resolve(MOCK_GEOLOCATION_DATA),
+                    ok: true,
+                    status: 200,
+                });
+            } else if (url.includes('api.openweathermap.org/data/3.0/onecall')) {
+                return Promise.resolve({
+                    json: () => Promise.resolve(MOCK_WEATHER_DATA),
+                    ok: true,
+                    status: 200,
+                });
+            }
+            return Promise.reject(new Error('Unknown fetch URL'));
+        });
+        mapPremiumWeatherData.mockResolvedValue(MAPPED_DATA);
+    });
 
+    afterAll(() => {
+        delete process.env.API_KEY;
+    });
+
+    it('should return weather data for a valid zip code', async () => {
+        const event = {
+            queryStringParameters: {zipcode: '12345'},
+        };
+
+        const response = await getWeatherPremium(event);
+
+        expect(global.fetch).toHaveBeenCalledWith(
+            `http://api.openweathermap.org/geo/1.0/zip?zip=12345,US&appid=${API_KEY}`
+        );
+        expect(global.fetch).toHaveBeenCalledWith(
+            `https://api.openweathermap.org/data/3.0/onecall?lat=${MOCK_GEOLOCATION_DATA.lat}&lon=${MOCK_GEOLOCATION_DATA.lon}&exclude=minutely&appid=${API_KEY}&units=imperial`
+        );
+        expect(mapPremiumWeatherData).toHaveBeenCalledWith(MOCK_WEATHER_DATA, mockCity);
+
+        expect(response).toEqual({
+            statusCode: 200,
+            body: JSON.stringify(MAPPED_DATA),
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+            },
+        });
+    });
+
+    it('should return weather data for the default zip code if no query parameters are provided', async () => {
         const event = {};
+
         const response = await getWeatherPremium(event);
 
-        expect(fetch).toHaveBeenCalledWith(`http://api.openweathermap.org/geo/1.0/zip?zip=20005,US&appid=${API_KEY}`);
-        expect(fetch).toHaveBeenCalledWith(
-            `https://api.openweathermap.org/data/3.0/onecall?lat=38.9067&lon=-77.0312&exclude=minutely&appid=${API_KEY}&units=imperial`
+        expect(global.fetch).toHaveBeenCalledWith(
+            `http://api.openweathermap.org/geo/1.0/zip?zip=20005,US&appid=${API_KEY}`
         );
+        expect(global.fetch).toHaveBeenCalledWith(
+            `https://api.openweathermap.org/data/3.0/onecall?lat=${MOCK_GEOLOCATION_DATA.lat}&lon=${MOCK_GEOLOCATION_DATA.lon}&exclude=minutely&appid=${API_KEY}&units=imperial`
+        );
+        expect(mapPremiumWeatherData).toHaveBeenCalledWith(MOCK_WEATHER_DATA, mockCity);
+
         expect(response).toEqual({
             statusCode: 200,
-            body: JSON.stringify({mapped: 'data'}),
+            body: JSON.stringify(MAPPED_DATA),
             headers: {
                 'Access-Control-Allow-Origin': '*',
             },
         });
     });
 
-    it('should return weather data for a valid zipcode', async () => {
-        fetch.mockResolvedValueOnce(
-            new Response(JSON.stringify({lat: 40.7128, lon: -74.006, name: 'New York'}), {status: 200})
-        );
-        fetch.mockResolvedValueOnce(new Response(JSON.stringify({weather: 'data'}), {status: 200}));
-        mapPremiumWeatherData.mockResolvedValueOnce({mapped: 'data'});
+    it('should return a 404 error for a zip code that is not 5 digits', async () => {
+        const event = {
+            queryStringParameters: {zipcode: '123'},
+        };
 
-        const event = {queryStringParameters: {zipcode: '10001'}};
         const response = await getWeatherPremium(event);
 
-        expect(fetch).toHaveBeenCalledWith('http://api.openweathermap.org/geo/1.0/zip?zip=10001,US&appid=test-api-key');
-        expect(fetch).toHaveBeenCalledWith(
-            'https://api.openweathermap.org/data/3.0/onecall?lat=40.7128&lon=-74.006&exclude=minutely&appid=test-api-key&units=imperial'
-        );
+        expect(global.fetch).not.toHaveBeenCalled();
         expect(response).toEqual({
-            statusCode: 200,
-            body: JSON.stringify({mapped: 'data'}),
+            statusCode: 404,
+            body: JSON.stringify({error: 'Bad Request. Please send correct data.'}),
             headers: {
                 'Access-Control-Allow-Origin': '*',
             },
         });
     });
 
-    it('should handle errors from OpenWeatherMap', async () => {
-        fetch.mockResolvedValueOnce(new Response(JSON.stringify({message: 'error'}), {status: 404}));
+    it('should return a 400 error if zipcode parameter is missing', async () => {
+        const event = {
+            queryStringParameters: {otherParam: 'someValue'},
+        };
 
-        const event = {queryStringParameters: {zipcode: '10001'}};
         const response = await getWeatherPremium(event);
+
+        expect(global.fetch).not.toHaveBeenCalled();
+        expect(response).toEqual({
+            statusCode: 400,
+            body: JSON.stringify({error: 'Bad Request. Please send correct data.'}),
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+            },
+        });
+    });
+
+    it('should return a 404 error if geolocation data is incomplete', async () => {
+        global.fetch = jest.fn(url => {
+            if (url.includes('api.openweathermap.org/geo/1.0/zip')) {
+                return Promise.resolve({
+                    json: () => Promise.resolve({lat: 38.9072}), // Missing lon and name
+                    ok: true,
+                    status: 200,
+                });
+            } else if (url.includes('api.openweathermap.org/data/3.0/onecall')) {
+                return Promise.resolve({
+                    json: () => Promise.resolve(MOCK_WEATHER_DATA),
+                    ok: true,
+                    status: 200,
+                });
+            }
+            return Promise.reject(new Error('Unknown fetch URL'));
+        });
+
+        const event = {
+            queryStringParameters: {zipcode: '12345'},
+        };
+
+        const response = await getWeatherPremium(event);
+
+        expect(global.fetch).toHaveBeenCalledWith(
+            `http://api.openweathermap.org/geo/1.0/zip?zip=12345,US&appid=${API_KEY}`
+        );
+        expect(global.fetch).not.toHaveBeenCalledWith(
+            `https://api.openweathermap.org/data/3.0/onecall?lat=${MOCK_GEOLOCATION_DATA.lat}&lon=${MOCK_GEOLOCATION_DATA.lon}&exclude=minutely&appid=${API_KEY}&units=imperial`
+        );
+        expect(mapPremiumWeatherData).not.toHaveBeenCalled();
 
         expect(response).toEqual({
             statusCode: 404,
-            body: JSON.stringify({message: 'error'}),
+            body: JSON.stringify({
+                error: 'Geolocation data incomplete! We cant do it Johnny! Get out! Error: {"lat":38.9072}',
+            }),
             headers: {
                 'Access-Control-Allow-Origin': '*',
             },
         });
-    });
-
-    it('should handle exceptions', async () => {
-        fetch.mockImplementationOnce(() => {
-            throw new Error('Fetch error');
-        });
-        const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-
-        const event = {queryStringParameters: {zipcode: '10001'}};
-        const response = await getWeatherPremium(event);
-
-        expect(consoleLogSpy).toHaveBeenCalledWith(
-            expect.stringContaining('There was an error fetching the weather in the lambda: Error: Fetch error')
-        );
-        expect(response).toBeUndefined();
     });
 });
