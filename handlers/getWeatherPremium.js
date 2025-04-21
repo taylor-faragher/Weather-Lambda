@@ -43,9 +43,32 @@ export const getWeatherPremium = async event => {
             const geolocationResponse = await fetch(
                 `http://api.openweathermap.org/geo/1.0/zip?zip=${zipCode},US&appid=${key}`
             );
+            if (!geolocationResponse.ok) {
+                const errorBody = await geolocationResponse.json();
+                logger.error(
+                    'Geolocation API returned non-ok status. It is not ok:',
+                    geolocationResponse.status,
+                    errorBody
+                );
+
+                return {
+                    statusCode: geolocationResponse.status,
+                    body: JSON.stringify({
+                        error: `'Geolocation API returned non-ok status. It is not ok: ${errorBody}`,
+                        details: errorBody,
+                    }),
+                    headers: {
+                        'Access-Control-Allow-Origin': '*',
+                    },
+                };
+            }
+
             data = await geolocationResponse.json();
         } catch (error) {
-            logger.error('Failed to get geolocation data. Bummer! Here is the error from openweathermap: ', error);
+            logger.error(
+                'Failed to get geolocation data or parse it. Bummer! Here is the error from openweathermap: ',
+                error
+            );
             return {
                 statusCode: 500,
                 body: JSON.stringify({error: 'Error in Geolocation. Please try again later.'}),
@@ -57,6 +80,18 @@ export const getWeatherPremium = async event => {
 
         logger.info('Got the geolocation data: ', data);
 
+        if (!data || !data.lat || !data.lon || !data.name) {
+            logger.warn('Geolocation data incomplete! We cant do it Johnny! Get out!', zipCode, data);
+            return {
+                statusCode: 404, // Not Found
+                body: JSON.stringify({
+                    error: `Geolocation data incomplete! We cant do it Johnny! Get out! Error: ${JSON.stringify(data)}`,
+                }),
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                },
+            };
+        }
         const lat = data.lat;
         const lon = data.lon;
         const city = data.name;
@@ -67,6 +102,20 @@ export const getWeatherPremium = async event => {
             oneCall = await fetch(
                 `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=minutely&appid=${key}&units=imperial`
             );
+            if (!oneCall.ok) {
+                const errorBody = await oneCall.json();
+                logger.error('Bailing on getting weather:', oneCall.status, errorBody);
+                return {
+                    statusCode: oneCall.status,
+                    body: JSON.stringify({
+                        error: `Bailing on getting weather: ${errorBody}`,
+                        details: errorBody,
+                    }),
+                    headers: {
+                        'Access-Control-Allow-Origin': '*',
+                    },
+                };
+            }
             oneCallData = await oneCall.json();
         } catch (error) {
             logger.error('Failed to get one call data. Bummer! Here is the error from openweathermap: ', error);
