@@ -17,7 +17,7 @@ const mapFreemiumWeatherData = async (data, city = 'Washington') => {
             description: data.current.weather[0].description,
             minTemperature: Math.round(data.daily[0].temp.min),
             maxTemperature: Math.round(data.daily[0].temp.max),
-            windSpeed: data.current.wind_speed,
+            windSpeed: Math.round(data.current.wind_speed),
         },
         area: {
             timezone: data.timezone,
