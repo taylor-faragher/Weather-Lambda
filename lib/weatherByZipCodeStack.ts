@@ -1,7 +1,9 @@
-import {App, Stack, StackProps, aws_route53_targets} from 'aws-cdk-lib';
+import {App, Duration, Stack, StackProps, aws_route53_targets} from 'aws-cdk-lib';
 import {
+    AccessLogFormat,
     EndpointType,
     LambdaIntegration,
+    LogGroupLogDestination,
     Period,
     RestApi,
     SecurityPolicy,
@@ -13,6 +15,7 @@ import * as path from 'path';
 import {Runtime} from 'aws-cdk-lib/aws-lambda';
 import {getSecretByArn} from './credentials/getSecretByArn';
 import * as route53 from 'aws-cdk-lib/aws-route53';
+import {LogGroup} from 'aws-cdk-lib/aws-logs';
 
 interface WeatherStackProps extends StackProps {
     customConfig: Record<string, string>;
@@ -35,17 +38,19 @@ export class WeatherByZipCodeStack extends Stack {
 
         const weather = new NodejsFunction(this, 'getWeatherFreemiumGetHandler', {
             functionName: `${props.customConfig.lambdaFreemiumFunctionName}`,
-            runtime: Runtime.NODEJS_20_X,
+            runtime: Runtime.NODEJS_LATEST,
             handler: 'index.getWeatherFreemium',
             entry: path.join(__dirname, `/../handlers/getWeatherFreemium.js`),
             environment: {
                 API_KEY: `${decryptedApiKey}`,
             },
+            timeout: Duration.seconds(30),
+            memorySize: 1024,
         });
 
         const authorizer = new NodejsFunction(this, 'GetWeatherAuthorizerHandler', {
             functionName: `${props.customConfig.lambdaAuthorizerName}`,
-            runtime: Runtime.NODEJS_20_X,
+            runtime: Runtime.NODEJS_LATEST,
             handler: 'authorizer',
             entry: path.join(__dirname, `/../handlers/authorizer/handler.js`),
             environment: {
@@ -55,12 +60,14 @@ export class WeatherByZipCodeStack extends Stack {
 
         const premiumWeather = new NodejsFunction(this, 'getWeatherPremiumGetHandler', {
             functionName: `${props.customConfig.lambdaPremiumFunctionName}`,
-            runtime: Runtime.NODEJS_20_X,
+            runtime: Runtime.NODEJS_LATEST,
             handler: 'index.getWeatherPremium',
             entry: path.join(__dirname, `/../handlers/getWeatherPremium.js`),
             environment: {
                 API_KEY: `${decryptedApiKey}`,
             },
+            timeout: Duration.seconds(30),
+            memorySize: 1024,
         });
 
         const hostedZone = route53.HostedZone.fromLookup(this, 'HostedZone', {
@@ -72,10 +79,14 @@ export class WeatherByZipCodeStack extends Stack {
             validation: acm.CertificateValidation.fromDns(hostedZone),
         });
 
+        const apiGatewayLogGroup = new LogGroup(this, `${props.customConfig.apiGatewayLogGroupName}`);
+
         const api = new RestApi(this, 'WeatherByZipCodeApi', {
             restApiName: `${props.customConfig.restApiName}`,
             deployOptions: {
                 stageName: `${props.customConfig.env}`,
+                accessLogDestination: new LogGroupLogDestination(apiGatewayLogGroup),
+                accessLogFormat: AccessLogFormat.jsonWithStandardFields(),
             },
             endpointConfiguration: {
                 types: [EndpointType.REGIONAL],
