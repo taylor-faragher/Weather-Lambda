@@ -25,6 +25,8 @@ const mapFreemiumWeatherData = async (data, city = 'Washington') => {
         },
     };
 
+    logger.info('Returning mapped data: ', mappedData);
+
     return mappedData;
 };
 
