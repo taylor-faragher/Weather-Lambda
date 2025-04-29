@@ -6,5 +6,6 @@
     "lambdaFreemiumFunctionName": "GetWeatherFreemiumDevHandler",
     "lambdaPremiumFunctionName": "GetWeatherPremiumDevHandler",
     "lambdaAuthorizerName": "GetWeatherPremiumDevAuthorizer",
-    "restApiName": "GetWeatherApiDev"
+    "restApiName": "GetWeatherApiDev",
+    "apiGatewayLogGroupName": "GetWeatherApiGatewayProd"
 }
